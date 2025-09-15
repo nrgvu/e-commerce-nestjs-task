@@ -1,98 +1,275 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# E-commerce REST API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A comprehensive e-commerce backend API built with NestJS, TypeScript, and PostgreSQL. Features complete CRUD operations for users, categories, products, and product images with file upload capabilities.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Table of Contents
 
-## Description
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [API Endpoints](#api-endpoints)
+- [Entity Relationships](#entity-relationships)
+- [File Upload](#file-upload)
+- [Testing with Postman](#testing-with-postman)
+- [Project Structure](#project-structure)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Features
 
-## Project setup
+- **User Management**: Complete CRUD operations for user accounts
+- **Category System**: Categories with image upload support
+- **Product Management**: Products with category relationships
+- **Image Gallery**: Multiple image uploads per product with primary image designation
+- **File Validation**: Image type and size validation
+- **Entity Relationships**: Proper foreign key relationships between entities
+- **Error Handling**: Comprehensive validation and error responses
+- **Static File Serving**: Uploaded images accessible via URL
 
-```bash
-$ npm install
+## Tech Stack
+
+- **Framework**: NestJS
+- **Language**: TypeScript
+- **Database**: PostgreSQL
+- **ORM**: TypeORM
+- **File Upload**: Multer
+- **Validation**: class-validator, class-transformer
+
+## Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <your-repository-url>
+   cd e-commerce
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up the database**
+   - Create a PostgreSQL database
+   - Update database credentials in `main.ts` or use environment variables
+
+4. **Start the application**
+   ```bash
+   # Development mode
+   npm run start:dev
+   
+   # Production mode
+   npm run start:prod
+   ```
+
+## Configuration
+
+### Database Configuration
+
+Update the TypeORM configuration in your `app.module.ts`:
+
+```typescript
+TypeOrmModule.forRoot({
+  type: 'postgres',
+  host: 'localhost',
+  port: 5432,
+  username: 'your_username',
+  password: 'your_password',
+  database: 'your_database',
+  entities: [User, Category, Product, ProductImage],
+  synchronize: true, // Set to false in production
+})
 ```
 
-## Compile and run the project
+### File Upload Configuration
 
-```bash
-# development
-$ npm run start
+Uploaded files are stored in:
+- Categories: `./uploads/categories/`
+- Products: `./uploads/productImages/`
 
-# watch mode
-$ npm run start:dev
+Files are accessible at: `http://localhost:3000/uploads/{folder}/{filename}`
 
-# production mode
-$ npm run start:prod
+## API Endpoints
+
+### Users
+- `GET /users` - Get all users
+- `GET /users/:id` - Get user by ID
+- `POST /users` - Create new user
+- `PUT /users/:id` - Update user
+- `DELETE /users/:id` - Delete user
+
+### Categories
+- `GET /categories` - Get all categories
+- `GET /categories/:id` - Get category by ID
+- `POST /categories` - Create category with image upload
+- `PUT /categories/:id` - Update category
+- `DELETE /categories/:id` - Delete category
+
+### Products
+- `GET /products` - Get all products with categories and images
+- `GET /products/:id` - Get product by ID with relationships
+- `POST /products` - Create new product
+- `PUT /products/:id` - Update product
+- `DELETE /products/:id` - Delete product
+
+### Product Images
+- `GET /product-images` - Get all product images (with pagination)
+- `GET /product-images/:id` - Get specific image by ID
+- `GET /product-images/product/:productId` - Get all images for a product
+- `POST /product-images` - Upload multiple images for a product
+- `PUT /product-images/:id` - Update image details
+- `DELETE /product-images/:id` - Delete specific image
+
+## Entity Relationships
+
+```
+Category 1:N Product 1:N ProductImage
 ```
 
-## Run tests
+- **Category → Product**: One-to-Many (A category can have many products)
+- **Product → Category**: Many-to-One (A product belongs to one category)
+- **Product → ProductImage**: One-to-Many (A product can have many images)
+- **ProductImage → Product**: Many-to-One (An image belongs to one product)
 
-```bash
-# unit tests
-$ npm run test
+### Database Schema
 
-# e2e tests
-$ npm run test:e2e
+**Categories Table**
+- `id` (Primary Key)
+- `name`
+- `description`
+- `image` (file path)
 
-# test coverage
-$ npm run test:cov
+**Products Table**
+- `id` (Primary Key)
+- `name`
+- `description`
+- `price`
+- `stock`
+- `categoryId` (Foreign Key)
+
+**Product Images Table**
+- `id` (Primary Key)
+- `productId` (Foreign Key)
+- `imageUrl`
+- `isPrimary` (Boolean)
+- `altText`
+- `createdAt`
+- `updatedAt`
+
+## File Upload
+
+### Category Image Upload
+```http
+POST /categories
+Content-Type: multipart/form-data
+
+name: Electronics
+description: Electronic products
+image: [file]
 ```
 
-## Deployment
+### Product Images Upload
+```http
+POST /product-images
+Content-Type: multipart/form-data
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+productId: 1
+isPrimary: true
+altText: Main product image
+images: [file1]
+images: [file2]
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+**File Validation:**
+- Supported formats: JPEG, JPG, PNG, GIF
+- Maximum file size: 5MB per image
+- Multiple files supported for product images
 
-## Resources
+## Testing with Postman
 
-Check out a few resources that may come in handy when working with NestJS:
+### 1. Create Category
+```
+POST http://localhost:3000/categories
+Body (form-data):
+- name: Electronics
+- description: Electronic devices
+- image: [upload file]
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### 2. Create Product
+```
+POST http://localhost:3000/products
+Body (JSON):
+{
+  "name": "iPhone 15",
+  "description": "Latest iPhone model",
+  "price": 999.99,
+  "stock": 50,
+  "categoryId": 1
+}
+```
 
-## Support
+### 3. Upload Product Images
+```
+POST http://localhost:3000/product-images
+Body (form-data):
+- productId: 1
+- isPrimary: true
+- altText: iPhone 15 main image
+- images: [upload multiple files]
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### 4. Get Product with Relations
+```
+GET http://localhost:3000/products/1
+```
 
-## Stay in touch
+## Project Structure
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```
+src/
+├── users/
+│   ├── dto/
+│   ├── entities/
+│   ├── users.controller.ts
+│   ├── users.service.ts
+│   └── users.module.ts
+├── categories/
+│   ├── dto/
+│   ├── entities/
+│   ├── categories.controller.ts
+│   ├── categories.service.ts
+│   └── categories.module.ts
+├── products/
+│   ├── dto/
+│   ├── entities/
+│   ├── products.controller.ts
+│   ├── products.service.ts
+│   └── products.module.ts
+├── product-images/
+│   ├── dto/
+│   ├── entities/
+│   ├── product-images.controller.ts
+│   ├── product-images.service.ts
+│   └── product-images.module.ts
+├── app.module.ts
+└── main.ts
+```
+
+## Development Notes
+
+- Entity relationships are automatically loaded when fetching products
+- File uploads are validated for type and size
+- Primary image logic ensures only one primary image per product
+- Static file serving is configured for uploaded images
+- Global validation pipe ensures data integrity
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is for educational purposes.
