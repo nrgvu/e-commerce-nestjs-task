@@ -11,4 +11,7 @@ export class CreateCategoryDto {
     @IsOptional()
     @MaxLength(450)
     description: string;
+
+    
+    // there is no need to add the image to DTO 
 }

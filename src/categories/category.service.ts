@@ -3,7 +3,7 @@ import { CreateCategoryDto } from "./dto/create-category.dto";
 import { UpdateCategoryDto } from "./dto/update-category.dto";
 import { Category } from "./entities/category.entity";
 import { Repository } from "typeorm";
-import { ConflictException, NotFoundException } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 
 
 
@@ -15,6 +15,7 @@ import { ConflictException, NotFoundException } from "@nestjs/common";
     todo: remove()
 
 */
+@Injectable()
 export class CategoryService {
 
     constructor(       
@@ -22,8 +23,11 @@ export class CategoryService {
         private readonly categoryRepository: Repository<Category>,
     ){}
 
-    async create(CreateCategoryDto: CreateCategoryDto):Promise<Category>{
-        const {name, description} = CreateCategoryDto;
+    async create(createCategoryDto: CreateCategoryDto, image?: Express.Multer.File): Promise<Category>{
+        const {name, description} = createCategoryDto;
+        console.log('CreateCategoryDto:', createCategoryDto); // ✅ Debug log
+        console.log('Image:', image); // ✅ Debug log
+        
         const existingCategory = await this.categoryRepository.findOne({where: {name:name}});
         if(existingCategory){
             throw new ConflictException(`the category: ${name} already exist`)
@@ -32,6 +36,7 @@ export class CategoryService {
         const category = this.categoryRepository.create({
             name: name, 
             description: description,
+            image: `/uploads/categories/${image ? image.filename: null}` 
         })
 
         return this.categoryRepository.save(category);
@@ -45,7 +50,7 @@ export class CategoryService {
     }
 
     async getOne(id: number): Promise<Category>{
-        const category = await this.categoryRepository.findOne({where:{id:id}});
+        const category = await this.categoryRepository.findOne({where:{id:id}, relations:['products']});
         if(!category){
             throw new NotFoundException(`Category with id: ${id} not found`);
         }
@@ -79,9 +84,6 @@ export class CategoryService {
         }
 
         return this.categoryRepository.remove(categoryToRemove);
-    }
-
-
-    
+    } 
 
 }

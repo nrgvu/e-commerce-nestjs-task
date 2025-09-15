@@ -1,10 +1,12 @@
-import { timeStamp } from 'console';
+import { Product } from 'src/products/entities/product.entity';
+
 import {
     Entity,
     PrimaryGeneratedColumn, 
     Column, 
     CreateDateColumn, 
     UpdateDateColumn,
+    OneToMany,
     
 } from 'typeorm';
 
@@ -16,12 +18,20 @@ export class Category{
     @Column({type: 'varchar', length: 100})
     name: string;
     
-    @Column({type: 'text'})
+    @Column({type: 'text', nullable: true})
     description: string;
+
+    @Column({nullable: true})
+    image: string;
 
     @CreateDateColumn()
     createdAt: Date;
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @OneToMany(() => Product, product => product.category)
+    products: Product[]
+
+
 }
