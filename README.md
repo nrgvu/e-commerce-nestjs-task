@@ -1,275 +1,298 @@
-# E-commerce REST API
+# E-commerce NestJS API
 
-A comprehensive e-commerce backend API built with NestJS, TypeScript, and PostgreSQL. Features complete CRUD operations for users, categories, products, and product images with file upload capabilities.
+A robust e-commerce REST API built with NestJS, TypeScript, and PostgreSQL. Features complete CRUD operations, JWT authentication, and role-based authorization.
 
-## Table of Contents
+## 🚀 Features
 
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [API Endpoints](#api-endpoints)
-- [Entity Relationships](#entity-relationships)
-- [File Upload](#file-upload)
-- [Testing with Postman](#testing-with-postman)
-- [Project Structure](#project-structure)
+- **Complete Authentication System** - JWT-based login/register
+- **Role-Based Authorization** - Admin and user roles with guards
+- **Full CRUD Operations** - Users, Products, Categories, Product Images
+- **Database Integration** - PostgreSQL with TypeORM
+- **Data Validation** - DTOs with class-validator
+- **Security** - Password hashing, JWT tokens, protected endpoints
+- **API Documentation** - Swagger/OpenAPI integration
+- **Error Handling** - Comprehensive error responses
 
-## Features
+## 🛠 Tech Stack
 
-- **User Management**: Complete CRUD operations for user accounts
-- **Category System**: Categories with image upload support
-- **Product Management**: Products with category relationships
-- **Image Gallery**: Multiple image uploads per product with primary image designation
-- **File Validation**: Image type and size validation
-- **Entity Relationships**: Proper foreign key relationships between entities
-- **Error Handling**: Comprehensive validation and error responses
-- **Static File Serving**: Uploaded images accessible via URL
+- **Framework:** NestJS (Node.js)
+- **Language:** TypeScript
+- **Database:** PostgreSQL
+- **ORM:** TypeORM
+- **Authentication:** JWT (JSON Web Tokens)
+- **Validation:** class-validator & class-transformer
+- **Documentation:** Swagger/OpenAPI
+- **Testing:** Postman
 
-## Tech Stack
+## 📁 Project Structure
 
-- **Framework**: NestJS
-- **Language**: TypeScript
-- **Database**: PostgreSQL
-- **ORM**: TypeORM
-- **File Upload**: Multer
-- **Validation**: class-validator, class-transformer
-
-## Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <your-repository-url>
-   cd e-commerce
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Set up the database**
-   - Create a PostgreSQL database
-   - Update database credentials in `main.ts` or use environment variables
-
-4. **Start the application**
-   ```bash
-   # Development mode
-   npm run start:dev
-   
-   # Production mode
-   npm run start:prod
-   ```
-
-## Configuration
-
-### Database Configuration
-
-Update the TypeORM configuration in your `app.module.ts`:
-
-```typescript
-TypeOrmModule.forRoot({
-  type: 'postgres',
-  host: 'localhost',
-  port: 5432,
-  username: 'your_username',
-  password: 'your_password',
-  database: 'your_database',
-  entities: [User, Category, Product, ProductImage],
-  synchronize: true, // Set to false in production
-})
+```
+src/
+├── auth/                    # Authentication module
+│   ├── decorators/         # Custom decorators (Public, CurrentUser, Roles)
+│   ├── dto/               # Auth DTOs (Login, Register, Change Password)
+│   ├── guards/            # Authentication guards (JWT, Roles)
+│   ├── strategies/        # JWT strategy
+│   ├── auth.controller.ts # Auth endpoints
+│   ├── auth.service.ts    # Auth business logic
+│   └── auth.module.ts     # Auth module configuration
+├── users/                 # Users management
+│   ├── dto/              # User DTOs
+│   ├── entities/         # User entity
+│   ├── users.controller.ts
+│   ├── users.service.ts
+│   └── users.module.ts
+├── products/             # Products management
+├── categories/           # Categories management
+├── product-images/       # Product images management
+└── app.module.ts         # Main application module
 ```
 
-### File Upload Configuration
+## 🔧 Installation & Setup
 
-Uploaded files are stored in:
-- Categories: `./uploads/categories/`
-- Products: `./uploads/productImages/`
+### Prerequisites
+- Node.js (v16 or higher)
+- PostgreSQL
+- npm or yarn
 
-Files are accessible at: `http://localhost:3000/uploads/{folder}/{filename}`
+### 1. Clone the Repository
+```bash
+git clone https://github.com/nrgvu/e-commerce-nestjs-task.git
+cd e-commerce-nestjs-task
+```
 
-## API Endpoints
+### 2. Install Dependencies
+```bash
+npm install
+```
+
+### 3. Environment Configuration
+Create a `.env` file in the root directory:
+
+```env
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=your_db_username
+DB_PASSWORD=your_db_password
+DB_NAME=ecommerce_db
+
+# JWT Configuration
+JWT_SECRET=your_super_secret_jwt_key
+JWT_EXPIRES_IN=24h
+
+# Application
+PORT=3000
+```
+
+### 4. Database Setup
+```bash
+# Create database
+createdb ecommerce_db
+
+# Run migrations (if any)
+npm run migration:run
+```
+
+### 5. Start the Application
+```bash
+# Development mode
+npm run start:dev
+
+# Production mode
+npm run start:prod
+```
+
+The API will be running at `http://localhost:3000`
+
+## 📚 API Endpoints
+
+### Authentication
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/auth/register` | User registration | No |
+| POST | `/auth/login` | User login | No |
+| POST | `/auth/change-password` | Change password | Yes |
 
 ### Users
-- `GET /users` - Get all users
-- `GET /users/:id` - Get user by ID
-- `POST /users` - Create new user
-- `PUT /users/:id` - Update user
-- `DELETE /users/:id` - Delete user
-
-### Categories
-- `GET /categories` - Get all categories
-- `GET /categories/:id` - Get category by ID
-- `POST /categories` - Create category with image upload
-- `PUT /categories/:id` - Update category
-- `DELETE /categories/:id` - Delete category
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/users` | Get all users | Yes |
+| GET | `/users/:id` | Get user by ID | Yes |
+| POST | `/users` | Create new user | Yes |
+| PUT | `/users/:id` | Update user | Yes |
+| DELETE | `/users/:id` | Delete user | Yes |
 
 ### Products
-- `GET /products` - Get all products with categories and images
-- `GET /products/:id` - Get product by ID with relationships
-- `POST /products` - Create new product
-- `PUT /products/:id` - Update product
-- `DELETE /products/:id` - Delete product
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/products` | Get all products | No |
+| GET | `/products/:id` | Get product by ID | No |
+| POST | `/products` | Create new product | Yes |
+| PUT | `/products/:id` | Update product | Yes |
+| DELETE | `/products/:id` | Delete product | Yes |
+
+### Categories
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/categories` | Get all categories | No |
+| GET | `/categories/:id` | Get category by ID | No |
+| POST | `/categories` | Create new category | Yes |
+| PUT | `/categories/:id` | Update category | Yes |
+| DELETE | `/categories/:id` | Delete category | Yes |
 
 ### Product Images
-- `GET /product-images` - Get all product images (with pagination)
-- `GET /product-images/:id` - Get specific image by ID
-- `GET /product-images/product/:productId` - Get all images for a product
-- `POST /product-images` - Upload multiple images for a product
-- `PUT /product-images/:id` - Update image details
-- `DELETE /product-images/:id` - Delete specific image
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/product-images` | Get all product images | No |
+| GET | `/product-images/:id` | Get product image by ID | No |
+| POST | `/product-images` | Upload product image | Yes |
+| PUT | `/product-images/:id` | Update product image | Yes |
+| DELETE | `/product-images/:id` | Delete product image | Yes |
 
-## Entity Relationships
+## 🔐 Authentication Usage
 
+### 1. Register a New User
+```bash
+POST /auth/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "securePassword123"
+}
 ```
-Category 1:N Product 1:N ProductImage
+
+### 2. Login
+```bash
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "securePassword123"
+}
 ```
 
-- **Category → Product**: One-to-Many (A category can have many products)
-- **Product → Category**: Many-to-One (A product belongs to one category)
-- **Product → ProductImage**: One-to-Many (A product can have many images)
-- **ProductImage → Product**: Many-to-One (An image belongs to one product)
+**Response:**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com"
+  }
+}
+```
 
-### Database Schema
+### 3. Access Protected Endpoints
+```bash
+GET /users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
 
-**Categories Table**
-- `id` (Primary Key)
-- `name`
-- `description`
-- `image` (file path)
+## 📝 Example Requests
 
-**Products Table**
-- `id` (Primary Key)
-- `name`
-- `description`
-- `price`
-- `stock`
-- `categoryId` (Foreign Key)
-
-**Product Images Table**
-- `id` (Primary Key)
-- `productId` (Foreign Key)
-- `imageUrl`
-- `isPrimary` (Boolean)
-- `altText`
-- `createdAt`
-- `updatedAt`
-
-## File Upload
-
-### Category Image Upload
-```http
+### Create a Category
+```bash
 POST /categories
-Content-Type: multipart/form-data
+Authorization: Bearer your_jwt_token
+Content-Type: application/json
 
-name: Electronics
-description: Electronic products
-image: [file]
+{
+  "name": "Electronics",
+  "description": "Electronic devices and gadgets"
+}
 ```
 
-### Product Images Upload
-```http
-POST /product-images
-Content-Type: multipart/form-data
+### Create a Product
+```bash
+POST /products
+Authorization: Bearer your_jwt_token
+Content-Type: application/json
 
-productId: 1
-isPrimary: true
-altText: Main product image
-images: [file1]
-images: [file2]
-```
-
-**File Validation:**
-- Supported formats: JPEG, JPG, PNG, GIF
-- Maximum file size: 5MB per image
-- Multiple files supported for product images
-
-## Testing with Postman
-
-### 1. Create Category
-```
-POST http://localhost:3000/categories
-Body (form-data):
-- name: Electronics
-- description: Electronic devices
-- image: [upload file]
-```
-
-### 2. Create Product
-```
-POST http://localhost:3000/products
-Body (JSON):
 {
   "name": "iPhone 15",
-  "description": "Latest iPhone model",
+  "description": "Latest Apple smartphone",
   "price": 999.99,
-  "stock": 50,
   "categoryId": 1
 }
 ```
 
-### 3. Upload Product Images
-```
-POST http://localhost:3000/product-images
-Body (form-data):
-- productId: 1
-- isPrimary: true
-- altText: iPhone 15 main image
-- images: [upload multiple files]
-```
+## 🧪 Testing
 
-### 4. Get Product with Relations
-```
-GET http://localhost:3000/products/1
-```
+The API has been thoroughly tested using **Postman**. All endpoints are working correctly with proper:
+- ✅ Authentication validation
+- ✅ Data validation
+- ✅ Error handling
+- ✅ Success responses
 
-## Project Structure
+### Import Postman Collection
+You can test all endpoints by importing the Postman collection (if available) or manually testing each endpoint using the examples above.
 
-```
-src/
-├── users/
-│   ├── dto/
-│   ├── entities/
-│   ├── users.controller.ts
-│   ├── users.service.ts
-│   └── users.module.ts
-├── categories/
-│   ├── dto/
-│   ├── entities/
-│   ├── categories.controller.ts
-│   ├── categories.service.ts
-│   └── categories.module.ts
-├── products/
-│   ├── dto/
-│   ├── entities/
-│   ├── products.controller.ts
-│   ├── products.service.ts
-│   └── products.module.ts
-├── product-images/
-│   ├── dto/
-│   ├── entities/
-│   ├── product-images.controller.ts
-│   ├── product-images.service.ts
-│   └── product-images.module.ts
-├── app.module.ts
-└── main.ts
+## 🔒 Security Features
+
+- **Password Hashing** - Bcrypt for secure password storage
+- **JWT Authentication** - Stateless authentication tokens
+- **Route Guards** - Protected endpoints require valid tokens
+- **Role-Based Access** - Different permissions for admin/user roles
+- **Input Validation** - All inputs validated using DTOs
+- **Error Handling** - Secure error messages without sensitive data
+
+## 🚀 Deployment
+
+### Development
+```bash
+npm run start:dev
 ```
 
-## Development Notes
+### Production
+```bash
+npm run build
+npm run start:prod
+```
 
-- Entity relationships are automatically loaded when fetching products
-- File uploads are validated for type and size
-- Primary image logic ensures only one primary image per product
-- Static file serving is configured for uploaded images
-- Global validation pipe ensures data integrity
+### Docker (Optional)
+```bash
+# Build image
+docker build -t ecommerce-api .
 
-## Contributing
+# Run container
+docker run -p 3000:3000 ecommerce-api
+```
+
+## 📖 API Documentation
+
+Once the application is running, visit:
+- **Swagger UI:** `http://localhost:3000/api/docs`
+- **OpenAPI JSON:** `http://localhost:3000/api/docs-json`
+
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+## 📄 License
 
 This project is for educational purposes.
+
+## 👨‍💻 Author
+
+**Abdulrahman**
+- GitHub: [@nrgvu](https://github.com/nrgvu)
+- Email: abdulrahman.hashim2001@gmail.com
+
+## 🙏 Acknowledgments
+
+- NestJS team for the amazing framework
+- TypeORM for excellent database integration
+- The Node.js community for continuous support
+
+---
+
+**⭐ If you found this project helpful, give it a star!**
