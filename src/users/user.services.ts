@@ -1,4 +1,4 @@
-import {Injectable, NotFoundException , ConflictException} from '@nestjs/common';
+import {Injectable, NotFoundException , ConflictException, UnauthorizedException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {User, UserRole} from './entities/user.entity';
 import {CreateUserDto} from './dto/create-user.dto';
@@ -92,6 +92,39 @@ async remove(id: number){
    return this.userRepository.remove(userToRemove);
 }
 
+
+async findByEmail(email):Promise<User | null>{
+    const user = await this.userRepository.findOne({where: {email: email}});
+    if(!user){
+        return null
+    }
+
+    return user;
+}
+
+
+async updatePassword(userId: number, currentPassword: string, newPassword: string): Promise<void> {
+  // 1. Fetch the user from the database
+  const user = await this.userRepository.findOne({ where: { id: userId } });
+
+  if (!user) {
+    throw new NotFoundException('User not found.');
+  }
+
+  // 2. Validate the current password
+  // This step assumes you have a method to compare a plain text password with a hashed password
+  const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+  if (!isPasswordValid) {
+    throw new UnauthorizedException('Invalid current password.');
+  }
+
+  // 3. Hash the new password before saving
+  const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+  // 4. Update and save the user
+  user.password = hashedNewPassword;
+  await this.userRepository.save(user);
+}
 
 
 }

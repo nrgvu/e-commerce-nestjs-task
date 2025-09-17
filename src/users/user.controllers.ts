@@ -9,7 +9,8 @@ import {
     Patch,
     Query,
     HttpCode,
-    HttpStatus
+    HttpStatus,
+    UseGuards
 } from '@nestjs/common';
 
 import { User } from './entities/user.entity';
@@ -17,8 +18,10 @@ import { UserService } from './user.services';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { QueryUserDto } from './dto/query-user.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('users')
+@UseGuards(JwtAuthGuard)
 export class UsersController{
     constructor(private readonly userService: UserService){}
 
@@ -37,6 +40,12 @@ export class UsersController{
         return this.userService.getOne(id);
     };
 
+    // get By email new method to meet registerService methods
+    @Get('by-email')
+    async getByEmail(@Body('email') email: string): Promise<User | null> {
+        return this.userService.findByEmail(email);
+    }
+
     @Patch(':id')
     async update(@Param('id') id:number, @Body() updateUserDto: UpdateUserDto):Promise<User>{
         return this.userService.update(id, updateUserDto);
@@ -46,7 +55,24 @@ export class UsersController{
     @HttpCode(HttpStatus.NO_CONTENT) // this is for best practice 
     async remove(@Param('id') id:number):Promise<void>{
         await this.userService.remove(id);
-    }
+    }   
+
+
+
+@Patch(':id/password')
+async updatePassword(
+  @Param('id') id: number,
+  @Body('currentPassword') currentPassword: string,
+  @Body('newPassword') newPassword: string
+) {
+  return this.userService.updatePassword(
+    id, 
+    currentPassword, 
+    newPassword
+  );
+}
+
+
 
 
 }

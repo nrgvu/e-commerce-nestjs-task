@@ -9,6 +9,7 @@ import { User } from './users/entities/user.entity';
 import { Category } from './categories/entities/category.entity';
 import { Product } from './products/entities/product.entity';
 import { ProductImage } from './products_images/entities/product_images.entity';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -28,6 +29,7 @@ import { ProductImage } from './products_images/entities/product_images.entity';
     CategoryModule,
     ProductModule,
     ProductImageModule,
+    AuthModule
     
   ],
 

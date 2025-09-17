@@ -9,16 +9,19 @@ import {
     Query,
     HttpCode,
     HttpStatus,
-    UseInterceptors
+    UseInterceptors,
+    UseGuards
 } from '@nestjs/common';
 
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductService } from './product.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 
 @Controller ('products')
+@UseGuards(JwtAuthGuard)
 export class ProductController {
     constructor(private readonly productService: ProductService){};
 

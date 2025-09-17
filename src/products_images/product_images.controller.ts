@@ -1,12 +1,13 @@
-import { Body, Controller, Delete, Get, MaxFileSizeValidator, Param, ParseFilePipe, Patch, Post, Query, UploadedFile, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, MaxFileSizeValidator, Param, ParseFilePipe, Patch, Post, Query, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { ProdcutImagesService } from "./product_images.service";
 import { CreateProductImageDto } from "./dto/create-product_images.dto";
 import { extname } from "path";
 import { UpdateProductImageDto } from "./dto/update-product_images.dto";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 
-
+@UseGuards(JwtAuthGuard)
 @Controller('product-images')
 export class ProductImagesController { 
     constructor(private readonly productImageService: ProdcutImagesService){}

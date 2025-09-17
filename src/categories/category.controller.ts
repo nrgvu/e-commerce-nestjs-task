@@ -13,7 +13,8 @@ import {
     UploadedFile,
     ParseFilePipe,
     MaxFileSizeValidator,
-    FileTypeValidator
+    FileTypeValidator,
+    UseGuards
 } from '@nestjs/common';
 
 import { Category } from './entities/category.entity';
@@ -23,9 +24,10 @@ import { CategoryService } from './category.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('categories')
+@UseGuards(JwtAuthGuard)
 export class CategoryControllers {
     constructor(private readonly categoryService: CategoryService){};
 
